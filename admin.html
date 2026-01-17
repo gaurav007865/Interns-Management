@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <div class="appShell">
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sideTop">
+          <div class="brandBox">
+            <div class="brandLogo"><img src="logo.png" alt="COD Logo"></div>
+            <div class="brandText">
+              <h3>COD PANEL</h3>
+              <p>Admin Control</p>
+            </div>
+          </div>
+          <div class="rolePill">Admin</div>
+        </div>
+
+        <div class="nav">
+          <a class="active" href="#students">1) 👨‍🎓 Students</a>
+          <a href="#batch">2) 🧩 Batch + Intern Create</a>
+          <a href="#assign">3) 📌 Assign Task</a>
+          <a href="#subs">4) ✅ Submissions</a>
+        </div>
+
+        <div class="sideFooter">
+          ✅ Batch max 20 interns<br />
+          ✅ Batch-wise + Individual task<br />
+          ✅ Grade + remarks
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="main">
+
+        <div class="topbar">
+          <div class="titleWrap">
+            <h1>👑 Admin Panel</h1>
+            <p>Students list • Batch management • Task assign • Grading</p>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" onclick="init()">🔄 Refresh</button>
+            <button class="btn danger" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <!-- 1) Students List -->
+        <section class="card" id="students">
+          <div class="cardHead">
+            <div>
+              <h2>1) 👨‍🎓 All Students List</h2>
+              <span>Filter batch-wise + Sort A-Z</span>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Batch Filter</label>
+              <select id="filterBatch"></select>
+            </div>
+            <div>
+              <label>Sort</label>
+              <select id="sortType">
+                <option value="">Default</option>
+                <option value="A-Z">A-Z</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn primary" onclick="loadInterns()">Load Students</button>
+
+          <div class="tableWrap" style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>InternID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Batch</th>
+                  <th>Duration</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="internTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 2) Batch + Create Intern -->
+        <div class="grid2" id="batch">
+
+          <section class="card">
+            <div class="cardHead">
+              <div>
+                <h2>2A) 🧩 Create Batch</h2>
+                <span>Max 20 interns per batch</span>
+              </div>
+            </div>
+
+            <label>Batch Name</label>
+            <input id="batchName" placeholder="BATCH-1 / JAN-2026" />
+
+            <button class="btn primary" onclick="createBatch()">Create Batch</button>
+
+            <div class="small" id="batchMsg"></div>
+          </section>
+
+          <section class="card">
+            <div class="cardHead">
+              <div>
+                <h2>2B) ➕ Create Intern</h2>
+                <span>Batch required</span>
+              </div>
+            </div>
+
+            <label>Name</label>
+            <input id="inName" placeholder="Intern Name" />
+
+            <label>Email</label>
+            <input id="inEmail" placeholder="intern@gmail.com" />
+
+            <label>Select Batch</label>
+            <select id="inBatch"></select>
+
+            <label>Duration</label>
+            <select id="inDuration">
+              <option>6 Months</option>
+              <option>9 Months</option>
+            </select>
+
+            <button class="btn primary" onclick="createIntern()">Create Intern</button>
+            <div class="small" id="createdInternText"></div>
+          </section>
+
+        </div>
+
+        <!-- 3) Assign Task -->
+        <section class="card" id="assign">
+          <div class="cardHead">
+            <div>
+              <h2>3) 📌 Assign Task</h2>
+              <span>Batch-wise OR Individual</span>
+            </div>
+          </div>
+
+          <label>Date</label>
+          <input id="taskDate" type="date" />
+
+          <label>Task Title</label>
+          <input id="taskTitle" placeholder="Day X: Task name" />
+
+          <label>Description</label>
+          <textarea id="taskDesc" placeholder="Write full task details..."></textarea>
+
+          <div class="row2">
+            <div>
+              <label>Assign Batch-wise</label>
+              <select id="assignBatch"></select>
+              <button class="btn primary" onclick="assignBatchTask()">Assign Batch Task</button>
+            </div>
+
+            <div>
+              <label>Assign Individual Intern</label>
+              <input id="assignInternId" placeholder="INT0001" />
+              <button class="btn" onclick="assignIndividualTask()">Assign Individual Task</button>
+            </div>
+          </div>
+
+          <div class="small">
+            ✅ Individual task assign hote hi intern side “Today’s Task” box me show hoga.
+          </div>
+        </section>
+
+        <!-- 4) Submissions -->
+        <section class="card" id="subs">
+          <div class="cardHead">
+            <div>
+              <h2>4) ✅ Submissions</h2>
+              <span>Check link + grade assign</span>
+            </div>
+            <button class="btn" onclick="loadSubmissions()">🔄 Refresh</button>
+          </div>
+
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>SubmissionID</th>
+                  <th>TaskID</th>
+                  <th>InternID</th>
+                  <th>Link</th>
+                  <th>Details</th>
+                  <th>SubmittedAt</th>
+                  <th>Grade</th>
+                  <th>Remarks</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="subsTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+
+  <!-- ✅ Intern Overview Modal -->
+<div id="internModal" class="loaderOverlay" style="display:none;">
+  <div class="loaderCard" style="width:min(1100px,94vw); text-align:left;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <div>
+        <div style="font-family:Orbitron,Inter;font-size:16px;font-weight:900;">
+          👨‍🎓 Intern Overview
+        </div>
+        <div style="color:var(--muted);font-size:12px;margin-top:6px;" id="modalMeta">Loading...</div>
+      </div>
+      <button class="btn danger" onclick="closeInternModal()">Close</button>
+    </div>
+
+    <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,0.10);padding-top:14px;">
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr);">
+        <div class="kpi"><b id="mStreak">0</b><small>Streak</small></div>
+        <div class="kpi"><b id="mTotalSub">0</b><small>Total Submissions</small></div>
+        <div class="kpi"><b id="mPending">0</b><small>Pending</small></div>
+        <div class="kpi"><b id="mApproved">0</b><small>Approved</small></div>
+      </div>
+
+      <div style="margin-top:14px;" class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Grade</th>
+              <th>Submission</th>
+            </tr>
+          </thead>
+          <tbody id="modalHistory"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Loader + Toast -->
+  <div id="loaderOverlay" class="loaderOverlay">
+    <div class="loaderCard">
+      <div class="spinner"></div>
+      <div id="loaderText">Loading...</div>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+  <script>
+    const admin = getSession("admin");
+    if (!admin) window.location.href = "index.html";
+
+    document.getElementById("taskDate").value = new Date().toISOString().slice(0, 10);
+
+    async function init() {
+      await loadBatches();
+      await loadInterns();
+      await loadSubmissions();
+    }
+
+    async function loadBatches() {
+      showLoader(true, "Loading Batches...");
+      const data = await apiGET({ action: "getBatches", adminId: admin.adminId, adminPass: admin.adminPass });
+      showLoader(false);
+
+      if (!data.success) { toast(data.message, "error"); return; }
+
+      const opts = `<option value="">All</option>` + data.batches.map(b => `<option value="${b.BatchID}">${b.BatchName} (${b.BatchID})</option>`).join("");
+
+      document.getElementById("filterBatch").innerHTML = opts;
+      document.getElementById("inBatch").innerHTML = data.batches.map(b => `<option value="${b.BatchID}">${b.BatchName} (${b.BatchID})</option>`).join("");
+      document.getElementById("assignBatch").innerHTML = data.batches.map(b => `<option value="${b.BatchID}">${b.BatchName} (${b.BatchID})</option>`).join("");
+    }
+
+    async function createBatch() {
+      showLoader(true, "Creating Batch...");
+      const batchName = document.getElementById("batchName").value.trim();
+
+      const data = await apiPOST({
+        action: "adminCreateBatch",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        batchName
+      });
+      showLoader(false);
+
+      if (data.success) {
+        toast("Batch Created ✅", "success");
+        document.getElementById("batchMsg").innerHTML = `✅ Created: <b>${data.batchName}</b> (${data.batchId})`;
+        document.getElementById("batchName").value = "";
+        loadBatches();
+      } else toast(data.message, "error");
+    }
+
+    async function createIntern() {
+      showLoader(true, "Creating Intern...");
+      const name = document.getElementById("inName").value.trim();
+      const email = document.getElementById("inEmail").value.trim();
+      const batchId = document.getElementById("inBatch").value;
+      const duration = document.getElementById("inDuration").value;
+
+      const data = await apiPOST({
+        action: "adminCreateIntern",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        name, email, batchId, duration
+      });
+      showLoader(false);
+
+      if (data.success) {
+        toast("Intern Created ✅", "success");
+        document.getElementById("createdInternText").innerHTML =
+          `✅ InternID: <b>${data.internId}</b> | Batch: <b>${data.batchName}</b>`;
+        loadInterns();
+      } else toast(data.message, "error");
+    }
+
+    async function loadInterns() {
+      showLoader(true, "Loading Students...");
+      const batchId = document.getElementById("filterBatch").value;
+      const sort = document.getElementById("sortType").value;
+
+      const data = await apiGET({
+        action: "getInternsList",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        batchId,
+        sort
+      });
+      showLoader(false);
+
+      if (!data.success) { toast(data.message, "error"); return; }
+
+      const tb = document.getElementById("internTable");
+      tb.innerHTML = "";
+
+      if (data.interns.length === 0) {
+        tb.innerHTML = `<tr><td colspan="5">No interns found ✅</td></tr>`;
+        return;
+      }
+
+      data.interns.forEach(i => {
+       tb.innerHTML += `
+  <tr>
+    <td><b>${i.InternID}</b></td>
+    <td>${i.Name}</td>
+    <td>${i.Email}</td>
+    <td>${i.BatchName}</td>
+    <td>${i.Duration}</td>
+    <td>
+      <button class="btn" style="padding:8px 12px;border-radius:14px;font-weight:900;"
+        onclick="openInternOverview('${i.InternID}')">⋮</button>
+    </td>
+  </tr>
+`;
+
+
+      });
+    }
+
+    async function assignBatchTask() {
+      showLoader(true, "Assigning Batch Task...");
+      const date = document.getElementById("taskDate").value;
+      const batchId = document.getElementById("assignBatch").value;
+      const title = document.getElementById("taskTitle").value.trim();
+      const description = document.getElementById("taskDesc").value.trim();
+
+      const data = await apiPOST({
+        action: "adminAssignBatchTask",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        date, batchId, title, description
+      });
+      showLoader(false);
+
+      if (data.success) toast("Batch Task Assigned ✅", "success");
+      else toast(data.message, "error");
+    }
+
+    async function assignIndividualTask() {
+      showLoader(true, "Assigning Individual Task...");
+      const date = document.getElementById("taskDate").value;
+      const internId = document.getElementById("assignInternId").value.trim();
+      const title = document.getElementById("taskTitle").value.trim();
+      const description = document.getElementById("taskDesc").value.trim();
+
+      const data = await apiPOST({
+        action: "adminAssignIndividualTask",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        date, internId, title, description
+      });
+      showLoader(false);
+
+      if (data.success) toast("Individual Task Assigned ✅", "success");
+      else toast(data.message, "error");
+    }
+
+    async function loadSubmissions() {
+      showLoader(true, "Loading Submissions...");
+      const data = await apiGET({
+        action: "getPendingSubmissions",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass
+      });
+      showLoader(false);
+
+      if (!data.success) { toast(data.message, "error"); return; }
+
+      const tb = document.getElementById("subsTable");
+      tb.innerHTML = "";
+
+      if (data.submissions.length === 0) {
+        tb.innerHTML = `<tr><td colspan="9">No pending submissions ✅</td></tr>`;
+        return;
+      }
+
+      data.submissions.forEach(s => {
+        tb.innerHTML += `
+          <tr>
+            <td>${s.SubmissionID}</td>
+            <td>${s.AssignedTaskID}</td>
+            <td><b>${s.InternID}</b></td>
+            <td><a href="${s.Link}" target="_blank" style="color:var(--p3);font-weight:800;">Open</a></td>
+            <td>${s.Details || "-"}</td>
+            <td>${s.SubmittedAt}</td>
+            <td><input id="g_${s.SubmissionID}" placeholder="A / 10"/></td>
+            <td><input id="r_${s.SubmissionID}" placeholder="remarks"/></td>
+            <td style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn primary" onclick="grade('${s.SubmissionID}','Approved')">Approve</button>
+              <button class="btn danger" onclick="grade('${s.SubmissionID}','Rejected')">Reject</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function grade(submissionId, finalStatus) {
+      showLoader(true, "Saving Grade...");
+      const grade = document.getElementById("g_" + submissionId).value.trim();
+      const remarks = document.getElementById("r_" + submissionId).value.trim();
+
+      const data = await apiPOST({
+        action: "adminGradeSubmission",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        submissionId,
+        finalStatus,
+        grade,
+        remarks
+      });
+      showLoader(false);
+
+      if (data.success) {
+        toast("Graded ✅", "success");
+        loadSubmissions();
+      } else toast(data.message, "error");
+    }
+
+
+    function closeInternModal(){
+  const m = document.getElementById("internModal");
+  m.style.display = "none";
+}
+
+async function openInternOverview(internId){
+  const m = document.getElementById("internModal");
+  m.style.display = "flex";
+
+  document.getElementById("modalMeta").innerText = "Loading intern data...";
+  document.getElementById("modalHistory").innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+
+  const data = await apiGET({
+    action:"adminInternOverview",
+    adminId: admin.adminId,
+    adminPass: admin.adminPass,
+    internId
+  });
+
+  if(!data.success){
+    toast(data.message,"error");
+    closeInternModal();
+    return;
+  }
+
+  const I = data.intern;
+
+  document.getElementById("modalMeta").innerText =
+    `ID: ${I.InternID} | Name: ${I.Name} | Email: ${I.Email} | Batch: ${I.BatchName} | Duration: ${I.Duration}`;
+
+  document.getElementById("mStreak").innerText = data.streak || 0;
+  document.getElementById("mTotalSub").innerText = data.submissions.total || 0;
+  document.getElementById("mPending").innerText = data.submissions.pending.length || 0;
+  document.getElementById("mApproved").innerText = data.submissions.approved.length || 0;
+
+  const tb = document.getElementById("modalHistory");
+  tb.innerHTML = "";
+
+  const history = (data.history || []).slice(0, 50);
+
+  if(history.length === 0){
+    tb.innerHTML = `<tr><td colspan="5">No history found ✅</td></tr>`;
+    return;
+  }
+
+  history.forEach(h=>{
+    const subLink = h.SubmissionLink
+      ? `<a href="${h.SubmissionLink}" target="_blank" style="color:var(--p3);font-weight:900;">Open</a>`
+      : "-";
+
+    tb.innerHTML += `
+      <tr>
+        <td>${h.Date}</td>
+        <td><b>${h.Title}</b><br/><span style="color:var(--muted);font-size:12px;">${h.Description || ""}</span></td>
+        <td>${h.Status || "-"}</td>
+        <td><b>${h.Grade || "Not Seen"}</b></td>
+        <td>${subLink}</td>
+      </tr>
+    `;
+  });
+}
+
+
+    init();
+  </script>
+</body>
+
+</html>
