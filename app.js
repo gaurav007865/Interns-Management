@@ -1,16 +1,32 @@
 // ✅ PUT YOUR APPS SCRIPT WEB APP URL HERE (must end with /exec)
-const API_URL = "https://script.google.com/macros/s/AKfycbzJ49VT8tLr54FELBggqwcOeghhIw72FhelKgEtB9DDSI7COXiH-aPBUiPD-o76PRNAQA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbw2yBgRFdoOTaFjgJ2dnFi2aIrbRgo_8KwipxRa70ySD97f0sfb6XP9xeR6t1sQRBgNMw/exec";
 
 // ===============================
 // Loader + Toast
 // ===============================
-function showLoader(show = true, text = "Loading...") {
+let LOADER_LOCK = false;
+
+function showLoader(show = true, text = "Loading...", silent = false) {
   const overlay = document.getElementById("loaderOverlay");
   const loaderText = document.getElementById("loaderText");
   if (!overlay) return;
-  if (loaderText) loaderText.innerText = text;
-  overlay.classList.toggle("show", show);
+
+  // ✅ Silent mode: SHOW block, HIDE allowed
+  if (silent && show) return;
+
+  if (show) {
+    if (LOADER_LOCK) return;
+    LOADER_LOCK = true;
+    if (loaderText) loaderText.innerText = text;
+    overlay.classList.add("show");
+  } else {
+    LOADER_LOCK = false;
+    overlay.classList.remove("show");
+  }
 }
+
+
+
 
 function toast(msg, type = "success") {
   const el = document.getElementById("toast");
