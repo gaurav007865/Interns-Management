@@ -275,6 +275,7 @@
           <div class="tabBtn active" onclick="openTab('adminTab')">👑 Admin</div>
           <div class="tabBtn" onclick="openTab('internTab')">👨‍💻 Intern</div>
           <div class="tabBtn" onclick="openTab('passTab')">🔐 Set Password</div>
+          <div class="tabBtn" onclick="openTab('forgotTab')">🔁 Forgot</div>
         </div>
 
         <!-- Admin Tab -->
@@ -336,6 +337,32 @@
             ⚠️ Password ek hi baar set hoga. Dobara set nahi kar paoge.
           </div>
         </div>
+
+        <!-- Forgot Password Tab -->
+        <div id="forgotTab" class="tabPanel">
+  <div class="formTitle">
+    <h2>🔁 Forgot Password</h2>
+    <span>OTP 5 min</span>
+  </div>
+
+  <label>Intern ID</label>
+  <input id="fpInternId" placeholder="INT0001" />
+
+  <button class="btn primary" onclick="requestOTP()">Send OTP</button>
+
+  <div class="small" id="otpTimerText" style="margin-top:10px;"></div>
+
+  <label style="margin-top:12px;">Enter OTP</label>
+  <input id="fpOtp" placeholder="6-digit OTP" />
+
+  <label>New Password</label>
+  <input id="fpNewPass" type="password" placeholder="New password" />
+
+  <button class="btn" onclick="verifyOTPReset()">Verify OTP & Reset</button>
+</div>
+
+ 
+
 
       </section>
     </div>
@@ -415,6 +442,88 @@
         toast(data.message,"error");
       }
     }
+
+
+    let OTP_TIMER = null;
+let OTP_SECONDS = 0;
+
+function startOtpCountdown(minutes){
+  OTP_SECONDS = minutes * 60;
+  const el = document.getElementById("otpTimerText");
+
+  if(OTP_TIMER) clearInterval(OTP_TIMER);
+
+  OTP_TIMER = setInterval(()=>{
+    const m = Math.floor(OTP_SECONDS / 60);
+    const s = OTP_SECONDS % 60;
+
+    el.innerHTML = `⏳ OTP valid: <b>${m}:${String(s).padStart(2,'0')}</b>`;
+
+    OTP_SECONDS--;
+    if(OTP_SECONDS < 0){
+      clearInterval(OTP_TIMER);
+      el.innerHTML = `❌ OTP expired. Please resend OTP.`;
+    }
+  },1000);
+}
+
+async function requestOTP(){
+  const internId = document.getElementById("fpInternId").value.trim();
+  if(!internId){ toast("InternID required ❌","error"); return; }
+
+  showLoader(true,"Sending OTP...");
+  const data = await apiGET({action:"requestPasswordOTPGET", internId});
+
+  showLoader(false);
+
+  if(data.success){
+    toast("OTP Sent ✅","success");
+    startOtpCountdown(data.validMinutes || 5);
+  }else{
+    toast(data.message,"error");
+  }
+}
+
+async function verifyOTPReset(){
+  const internId = document.getElementById("fpInternId").value.trim();
+  const otp = document.getElementById("fpOtp").value.trim();
+  const newPassword = document.getElementById("fpNewPass").value.trim();
+
+  if(!internId || !otp || !newPassword){
+    toast("Fill all fields ❌","error"); return;
+  }
+
+  showLoader(true,"Verifying OTP...");
+const data = await apiGET({
+  action:"verifyOTPAndResetGET",
+  internId,
+  otp,
+  newPassword
+});
+  showLoader(false);
+
+  if(data.success){
+    toast("Password Reset ✅ Now login","success");
+    openTab("internTab");
+  }else{
+    toast(data.message,"error");
+  }
+}
+
+(function autoOpenSetPass(){
+  const hash = window.location.hash || "";
+  if(hash.startsWith("#setpass")){
+    const params = new URLSearchParams(hash.split("?")[1] || "");
+    const internId = params.get("internId");
+    if(internId){
+      document.getElementById("setInternId").value = internId;
+      openTab("passTab");
+      toast("Set your password ✅","success");
+    }
+  }
+})();
+
+
   </script>
 </body>
 </html>

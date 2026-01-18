@@ -538,12 +538,13 @@ const visitedAdminPages = {
       const batchId = document.getElementById("inBatch").value;
       const duration = document.getElementById("inDuration").value;
 
-      const data = await apiPOST({
-        action:"adminCreateIntern",
-        adminId: admin.adminId,
-        adminPass: admin.adminPass,
-        name, email, batchId, duration
-      });
+      const data = await apiGET({
+  action:"adminCreateInternGET",
+  adminId: admin.adminId,
+  adminPass: admin.adminPass,
+  name, email, batchId, duration
+});
+
       showLoader(false);
 
       if(data.success){
